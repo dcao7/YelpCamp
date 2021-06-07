@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const ejsMate = require('ejs-mate');
+const { campgroundSchema } = require('./schemas')
 const catchAsync = require('./utils/catchAsync')
 const ExpressError = require('./utils/ExpressError')
 const Campground = require('./models/campground');
@@ -19,6 +20,16 @@ db.once("open", () => {
     console.log("Database connected");
 })
 
+
+const validateCampground = (req, res, next) => {
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+}
 
 const app = express();
 
@@ -38,8 +49,8 @@ app.get('/campgrounds', catchAsync(async (req, res) => {
     res.render('campgrounds/index', { campgrounds })
 }))
 
-app.post('/campgrounds', catchAsync(async (req, res, next) => {
-    if (!req.body.campground) throw new ExpressError('Invalid Campground Data', 400)
+app.post('/campgrounds', validateCampground, catchAsync(async (req, res, next) => {
+    //if (!req.body.campground) throw new ExpressError('Invalid Campground Data', 400)
     const newCampground = new Campground(req.body.campground);
     await newCampground.save();
     res.redirect(`/campgrounds/${newCampground._id}`)
@@ -60,7 +71,7 @@ app.get('/campgrounds/:id/edit', catchAsync(async (req, res) => {
     res.render('campgrounds/edit', { campground });
 }))
 
-app.put('/campgrounds/:id', catchAsync(async (req, res) => {
+app.put('/campgrounds/:id', validateCampground, catchAsync(async (req, res) => {
     // console.log(req.body.campground)
     await Campground.findByIdAndUpdate(req.params.id, req.body.campground, { new: true })
     res.redirect(`/campgrounds/${req.params.id}`);
