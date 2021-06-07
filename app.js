@@ -32,15 +32,20 @@ app.get('/', (req, res) => {
 })
 
 app.get('/campgrounds', async (req, res) => {
-    const campgrounds = await Campground.find({})
-    res.render('campgrounds/index', { campgrounds });
+    const campgrounds = await Campground.find({});
+    res.render('campgrounds/index', { campgrounds })
 })
 
-app.post('/campgrounds', async (req, res) => {
-    const newCampground = new Campground(req.body.campground);
-    await newCampground.save();
-    res.redirect(`/campgrounds/${newCampground._id}`);
+app.post('/campgrounds', async (req, res, next) => {
+    try {
+        const newCampground = new Campground(req.body.campground);
+        await newCampground.save();
+        res.redirect(`/campgrounds/${newCampground._id}`)
+    } catch (e) {
+        next(e)
+    }
 })
+
 
 app.get('/campgrounds/new', (req, res) => {
     res.render('campgrounds/new');
@@ -57,6 +62,7 @@ app.get('/campgrounds/:id/edit', async (req, res) => {
 })
 
 app.put('/campgrounds/:id', async (req, res) => {
+    // console.log(req.body.campground)
     await Campground.findByIdAndUpdate(req.params.id, req.body.campground, { new: true })
     res.redirect(`/campgrounds/${req.params.id}`);
 })
@@ -64,6 +70,10 @@ app.put('/campgrounds/:id', async (req, res) => {
 app.delete('/campgrounds/:id', async (req, res) => {
     await Campground.findByIdAndDelete(req.params.id)
     res.redirect('/campgrounds')
+})
+
+app.use((err, req, res, next) => {
+    res.send('Oh boy, something went wrong!')
 })
 
 app.listen(3000, () => {
