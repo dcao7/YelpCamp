@@ -74,7 +74,7 @@ app.get('/campgrounds/new', (req, res) => {
 })
 
 app.get('/campgrounds/:id', catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id)
+    const campground = await Campground.findById(req.params.id).populate('reviews');
     res.render('campgrounds/show', { campground });
 }))
 
@@ -84,7 +84,6 @@ app.get('/campgrounds/:id/edit', catchAsync(async (req, res) => {
 }))
 
 app.put('/campgrounds/:id', validateCampground, catchAsync(async (req, res) => {
-    // console.log(req.body.campground)
     await Campground.findByIdAndUpdate(req.params.id, req.body.campground, { new: true })
     res.redirect(`/campgrounds/${req.params.id}`);
 }))
