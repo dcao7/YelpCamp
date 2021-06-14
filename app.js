@@ -2,11 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const ejsMate = require('ejs-mate');
-const { campgroundSchema, reviewSchema } = require('./schemas')
-const catchAsync = require('./utils/catchAsync')
+const session = require('express-session')
 const ExpressError = require('./utils/ExpressError')
-const Campground = require('./models/campground');
-const Review = require('./models/review');
 const methodOverride = require('method-override');
 
 const campgrounds = require('./routes/campgrounds');
@@ -35,12 +32,24 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => {
-    res.render('home');
-})
+const sessionConfig = {
+    secret: 'thisshouldbeabettersecret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        macAge: 1000 * 60 * 60 * 24 * 7
+    }
+}
+app.use(session(sessionConfig));
 
 app.use('/campgrounds', campgrounds);
 app.use('/campgrounds/:id/reviews', reviews);
+
+app.get('/', (req, res) => {
+    res.render('home');
+})
 
 app.all('*', (req, res, next) => {
     next(new ExpressError('Page Not Found', 404))
