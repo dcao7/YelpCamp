@@ -24,7 +24,6 @@ db.once("open", () => {
 })
 
 const app = express();
-
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
@@ -43,6 +42,7 @@ const sessionConfig = {
         macAge: 1000 * 60 * 60 * 24 * 7
     }
 }
+
 app.use(session(sessionConfig));
 app.use(flash());
 

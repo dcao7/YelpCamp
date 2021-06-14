@@ -47,11 +47,13 @@ router.get('/:id/edit', catchAsync(async (req, res) => {
 
 router.put('/:id', validateCampground, catchAsync(async (req, res) => {
     await Campground.findByIdAndUpdate(req.params.id, req.body.campground, { new: true })
+    req.flash('success', 'Sucessfully updated a campground!');
     res.redirect(`/campgrounds/${req.params.id}`);
 }))
 
 router.delete('/:id', catchAsync(async (req, res) => {
     await Campground.findByIdAndDelete(req.params.id)
+    req.flash('success', 'Sucessfully deleted a campground!');
     res.redirect('/campgrounds')
 }))
 
