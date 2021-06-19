@@ -30,7 +30,11 @@ const seedDB = async () => {
                 filename: 'random/483251'
             }],
             description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis fuga tempora impedit? Optio sint harum dolore vitae aspernatur. Omnis itaque vel pariatur distinctio officiis, sequi cum error non deserunt commodi.',
-            price
+            price,
+            geometry: {
+                type: "Point",
+                coordinates: [ -113.1131, 47.0202]
+            }
         })
 
         await camp.save();
