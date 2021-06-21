@@ -10,10 +10,13 @@ const path = require('path');
 const ejsMate = require('ejs-mate');
 const session = require('express-session');
 const flash = require('connect-flash');
-const ExpressError = require('./utils/ExpressError')
-const methodOverride = require('method-override');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
+const express = require('express');
+
+
+const ExpressError = require('./utils/ExpressError')
+const methodOverride = require('method-override');
 const User = require('./models/user');
 
 const campgroundsRoutes = require('./routes/campgrounds');
@@ -42,6 +45,7 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(mongoSanitize());
 
 const sessionConfig = {
     secret: 'thisshouldbeabettersecret',
@@ -65,7 +69,7 @@ passport.serializeUser(User.serializeUser());      // plugin
 passport.deserializeUser(User.deserializeUser());    // plugin 
 
 app.use((req, res, next) => {
-    //console.log(req.session);
+    console.log(req.query);
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
