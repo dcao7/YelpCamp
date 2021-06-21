@@ -1,2 +1,3 @@
-autoGit.sh
+node_modules
 .env
+autoGit.sh
