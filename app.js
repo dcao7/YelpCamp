@@ -2,7 +2,6 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
-console.log(process.env.SECRET);
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -12,8 +11,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
-const express = require('express');
-
+const mongoSanitize = require('express-mongo-sanitize');
 
 const ExpressError = require('./utils/ExpressError')
 const methodOverride = require('method-override');
@@ -48,11 +46,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(mongoSanitize());
 
 const sessionConfig = {
+    name: 'session',
     secret: 'thisshouldbeabettersecret',
     resave: false,
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
+        // secure: true,
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         macAge: 1000 * 60 * 60 * 24 * 7
     }
@@ -69,7 +69,6 @@ passport.serializeUser(User.serializeUser());      // plugin
 passport.deserializeUser(User.deserializeUser());    // plugin 
 
 app.use((req, res, next) => {
-    console.log(req.query);
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
